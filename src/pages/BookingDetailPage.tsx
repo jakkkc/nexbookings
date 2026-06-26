@@ -94,6 +94,7 @@ export function BookingDetailPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [showPrintMenu, setShowPrintMenu] = useState(false)
+  const isOwner = user?.role === 'owner' || user?.role === 'super_admin'
   const canManage = user?.role !== undefined
 
   useEffect(() => { if (id) fetchData() }, [id])
@@ -148,7 +149,7 @@ export function BookingDetailPage() {
   async function updateStatus(newStatus: BookingStatus) {
     if (!booking) return
     setStatusUpdating(true)
-    await supabase.from('bookings').update({ status: newStatus } as any).eq('id', booking.id)
+    await (supabase.from('bookings') as any).update({ status: newStatus }).eq('id', booking.id)
     await fetchData()
     setStatusUpdating(false)
   }
@@ -159,7 +160,7 @@ export function BookingDetailPage() {
     setEditSaving(true)
     setEditError(null)
 
-    const { error } = await supabase.from('bookings').update({
+    const { error } = await (supabase.from('bookings') as any).update({
       guest_name: editForm.guest_name.trim(),
       guest_contact: editForm.guest_contact.trim() || null,
       check_in: editForm.check_in,
@@ -170,7 +171,7 @@ export function BookingDetailPage() {
       total_amount: editForm.total_amount,
       notes: editForm.notes.trim() || null,
       room_id: editForm.room_id,
-    } as any).eq('id', booking.id)
+    }).eq('id', booking.id)
 
     if (error) { setEditError(error.message); setEditSaving(false); return }
     setShowEditForm(false)
@@ -211,7 +212,7 @@ export function BookingDetailPage() {
       ? (payForm.amount * payForm.discount_pct) / 100
       : payForm.discount_amount
 
-    const { error } = await supabase.from('payments').insert({
+    const { error } = await (supabase.from('payments') as any).insert({
       booking_id: booking.id,
       amount: payForm.amount,
       payment_type: payForm.payment_type,
