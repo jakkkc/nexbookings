@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, db } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { AppLayout } from '../components/AppLayout'
 import { notifyBooking } from '../lib/notify'
@@ -67,8 +67,8 @@ export function NewBookingPage() {
   // Load properties on mount
   useEffect(() => {
     supabase.from('properties').select('*').order('name').then(({ data }) => {
-      setProperties(data || [])
-      if (data?.length === 1) setForm(f => ({ ...f, property_id: data[0].id }))
+      setProperties((data as any) || [])
+      if (data?.length === 1) setForm(f => ({ ...f, property_id: (data[0] as any).id }))
     })
   }, [])
 
@@ -134,7 +134,7 @@ export function NewBookingPage() {
     setSaving(true)
     setError(null)
 
-    const { data, error } = await supabase.from('bookings').insert({
+    const { data, error } = await db.from('bookings').insert({
       property_id: form.property_id,
       room_id: form.room_id,
       guest_name: form.guest_name.trim(),

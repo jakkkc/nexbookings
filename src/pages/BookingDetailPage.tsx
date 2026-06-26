@@ -4,7 +4,7 @@ import {
   ArrowLeft, Loader, Plus, Trash2, Upload,
   XCircle, LogIn, LogOut, CheckCircle, Pencil, Printer,
 } from 'lucide-react'
-import { supabase } from '../lib/supabase'
+import { supabase, db } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { AppLayout } from '../components/AppLayout'
 import type { Database, BookingStatus, PaymentType, OccupancyType, MealPlan } from '../types/database'
@@ -149,7 +149,7 @@ export function BookingDetailPage() {
   async function updateStatus(newStatus: BookingStatus) {
     if (!booking) return
     setStatusUpdating(true)
-    await (supabase.from('bookings') as any).update({ status: newStatus }).eq('id', booking.id)
+    await db.from('bookings').update({ status: newStatus }).eq('id', booking.id)
     await fetchData()
     setStatusUpdating(false)
   }
@@ -160,7 +160,7 @@ export function BookingDetailPage() {
     setEditSaving(true)
     setEditError(null)
 
-    const { error } = await (supabase.from('bookings') as any).update({
+    const { error } = await db.from('bookings').update({
       guest_name: editForm.guest_name.trim(),
       guest_contact: editForm.guest_contact.trim() || null,
       check_in: editForm.check_in,
@@ -212,7 +212,7 @@ export function BookingDetailPage() {
       ? (payForm.amount * payForm.discount_pct) / 100
       : payForm.discount_amount
 
-    const { error } = await (supabase.from('payments') as any).insert({
+    const { error } = await db.from('payments').insert({
       booking_id: booking.id,
       amount: payForm.amount,
       payment_type: payForm.payment_type,
