@@ -148,7 +148,7 @@ export function BookingDetailPage() {
   async function updateStatus(newStatus: BookingStatus) {
     if (!booking) return
     setStatusUpdating(true)
-    await supabase.from('bookings').update({ status: newStatus }).eq('id', booking.id)
+    await supabase.from('bookings').update({ status: newStatus } as any).eq('id', booking.id)
     await fetchData()
     setStatusUpdating(false)
   }
@@ -170,7 +170,7 @@ export function BookingDetailPage() {
       total_amount: editForm.total_amount,
       notes: editForm.notes.trim() || null,
       room_id: editForm.room_id,
-    }).eq('id', booking.id)
+    } as any).eq('id', booking.id)
 
     if (error) { setEditError(error.message); setEditSaving(false); return }
     setShowEditForm(false)
