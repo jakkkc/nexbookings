@@ -11,7 +11,6 @@ import type { Database, BookingStatus, PaymentType, OccupancyType, MealPlan } fr
 
 type Booking = Database['public']['Tables']['bookings']['Row']
 type Payment = Database['public']['Tables']['payments']['Row']
-type RoomType = Database['public']['Tables']['room_types']['Row']
 type Room = Database['public']['Tables']['rooms']['Row']
 
 interface BookingDetail extends Booking {

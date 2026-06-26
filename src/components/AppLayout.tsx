@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  X,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { ThemeSwitcher } from './ThemeSwitcher'
