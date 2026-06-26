@@ -10,5 +10,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
-// Untyped client for mutations where the generated types are too strict
-export const db = supabase as ReturnType<typeof createClient>
+// Untyped client for mutations where generated types are too strict
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const db: any = supabase
