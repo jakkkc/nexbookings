@@ -10,6 +10,9 @@ import { PropertyEditPage } from './pages/PropertyEditPage'
 import { BookingsPage } from './pages/BookingsPage'
 import { NewBookingPage } from './pages/NewBookingPage'
 import { BookingDetailPage } from './pages/BookingDetailPage'
+import { StaffPage } from './pages/StaffPage'
+import { PrintDocumentPage } from './pages/PrintDocumentPage'
+import { LandingPage } from './pages/LandingPage'
 
 export default function App() {
   return (
@@ -17,6 +20,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
 
             <Route path="/dashboard" element={
@@ -45,7 +49,17 @@ export default function App() {
               <ProtectedRoute><BookingDetailPage /></ProtectedRoute>
             } />
 
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/bookings/:id/print" element={
+              <ProtectedRoute><PrintDocumentPage /></ProtectedRoute>
+            } />
+
+            <Route path="/staff" element={
+              <ProtectedRoute allowedRoles={['owner', 'super_admin']}>
+                <StaffPage />
+              </ProtectedRoute>
+            } />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

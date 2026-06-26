@@ -4,6 +4,7 @@ import { ArrowLeft, AlertCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { AppLayout } from '../components/AppLayout'
+import { notifyBooking } from '../lib/notify'
 import type { Database, RoomPrices, OccupancyType, MealPlan } from '../types/database'
 
 type Property = Database['public']['Tables']['properties']['Row']
@@ -153,6 +154,20 @@ export function NewBookingPage() {
     setSaving(false)
 
     if (error) { setError(error.message); return }
+
+    // Notify staff — fire and forget
+    notifyBooking({
+      booking_id: data.id,
+      property_id: form.property_id,
+      guest_name: form.guest_name.trim(),
+      check_in: form.check_in,
+      check_out: form.check_out,
+      room_type_name: selectedRoomType?.name || '—',
+      room_name: availableRooms.find(r => r.id === form.room_id)?.name || '—',
+      total_amount: form.total_amount,
+      source: 'manual',
+    })
+
     navigate(`/bookings/${data.id}`)
   }
 
