@@ -61,12 +61,12 @@ export function StaffPage() {
 
     if (usersRes.error) { setError(usersRes.error.message); setLoading(false); return }
 
-    const propMap = Object.fromEntries((propsRes.data || []).map(p => [p.id, p.name]))
+    const propMap = Object.fromEntries((propsRes.data || []).map((p: any) => [p.id, p.name]))
     const assignments: Assignment[] = assignRes.data || []
 
     const staffWithAssignments: StaffWithAssignments[] = (usersRes.data || [])
-      .filter(u => u.role !== 'super_admin')
-      .map(u => {
+      .filter((u: any) => u.role !== 'super_admin')
+      .map((u: any) => {
         const userAssignments = assignments.filter(a => a.user_id === u.id)
         return {
           ...u,

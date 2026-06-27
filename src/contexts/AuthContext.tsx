@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       setSession(session)
       if (session?.user) {
         loadUser(session.user).finally(() => setLoading(false))
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (_event: any, session: any) => {
         setSession(session)
         if (session?.user) {
           await loadUser(session.user)

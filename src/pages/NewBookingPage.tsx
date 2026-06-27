@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
-import { supabase, db } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { AppLayout } from '../components/AppLayout'
 import { notifyBooking } from '../lib/notify'
@@ -66,9 +66,9 @@ export function NewBookingPage() {
 
   // Load properties on mount
   useEffect(() => {
-    supabase.from('properties').select('*').order('name').then(({ data }) => {
-      setProperties((data as any) || [])
-      if (data?.length === 1) setForm(f => ({ ...f, property_id: (data[0] as any).id }))
+    supabase.from('properties').select('*').order('name').then(({ data }: any) => {
+      setProperties(data || [])
+      if (data?.length === 1) setForm(f => ({ ...f, property_id: data[0].id }))
     })
   }, [])
 
@@ -76,7 +76,7 @@ export function NewBookingPage() {
   useEffect(() => {
     if (!form.property_id) { setRoomTypes([]); return }
     supabase.from('room_types').select('*').eq('property_id', form.property_id).order('name')
-      .then(({ data }) => setRoomTypes(data || []))
+      .then(({ data }: any) => setRoomTypes(data || []))
     setForm(f => ({ ...f, room_type_id: '', room_id: '' }))
     setAvailableRooms([])
     setAvailabilityChecked(false)
@@ -86,7 +86,7 @@ export function NewBookingPage() {
   useEffect(() => {
     if (!form.room_type_id) { setRooms([]); return }
     supabase.from('rooms').select('*').eq('room_type_id', form.room_type_id).order('name')
-      .then(({ data }) => setRooms(data || []))
+      .then(({ data }: any) => setRooms(data || []))
     setForm(f => ({ ...f, room_id: '' }))
     setAvailableRooms([])
     setAvailabilityChecked(false)
@@ -134,7 +134,7 @@ export function NewBookingPage() {
     setSaving(true)
     setError(null)
 
-    const { data, error } = await db.from('bookings').insert({
+    const { data, error } = await supabase.from('bookings').insert({
       property_id: form.property_id,
       room_id: form.room_id,
       guest_name: form.guest_name.trim(),
