@@ -98,28 +98,28 @@ Deno.serve(async (req) => {
     }
 
     // ── 5. Verify all property_ids belong to the account ─────
-    const { data: ownedProps, error: propError } = await adminClient
-      .from('properties')
-      .select('id')
-      .eq('account_id', account_id)
-      .in('id', property_ids)
+    if (property_ids.length > 0) {
+      const { data: ownedProps, error: propError } = await adminClient
+        .from('properties')
+        .select('id')
+        .eq('account_id', account_id)
+        .in('id', property_ids)
 
-    if (propError || !ownedProps || ownedProps.length !== property_ids.length) {
-      return new Response(JSON.stringify({ error: 'One or more properties do not belong to your account' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+      if (propError || !ownedProps || ownedProps.length !== property_ids.length) {
+        return new Response(JSON.stringify({ error: 'One or more properties do not belong to your account' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
     }
 
     // ── 6. Create the auth user with metadata ─────────────────
-    // Use createUser instead of inviteUserByEmail to avoid SMTP timeouts.
-    // We then send a password reset email so they can set their password.
-    const tempPassword = crypto.randomUUID() // temporary — they'll reset it
+    const tempPassword = crypto.randomUUID()
 
     const { data: newAuthUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password: tempPassword,
-      email_confirm: true, // skip email confirmation step
+      email_confirm: true,
       user_metadata: {
         account_id,
         role,
@@ -134,21 +134,20 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Staff member can use "Forgot password" on login page to set their password.
-
     // ── 7. Create staff_assignments ───────────────────────────
-    const assignments = property_ids.map((property_id) => ({
-      user_id: newAuthUser.user.id,
-      property_id,
-    }))
+    if (property_ids.length > 0) {
+      const assignments = property_ids.map((property_id: string) => ({
+        user_id: newAuthUser.user.id,
+        property_id,
+      }))
 
-    const { error: assignError } = await adminClient
-      .from('staff_assignments')
-      .insert(assignments)
+      const { error: assignError } = await adminClient
+        .from('staff_assignments')
+        .insert(assignments)
 
-    if (assignError) {
-      // Non-fatal: user was created, assignments failed — log it
-      console.error('staff_assignments insert failed:', assignError)
+      if (assignError) {
+        console.error('staff_assignments insert failed:', assignError)
+      }
     }
 
     return new Response(
