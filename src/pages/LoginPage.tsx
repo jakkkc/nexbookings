@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 
-type Mode = 'signin' | 'signup'
+type Mode = 'signin' | 'signup' | 'reset'
 
 export function LoginPage() {
   const { session, loading } = useAuth()
@@ -24,6 +24,19 @@ export function LoginPage() {
     setSubmitting(true)
     setError(null)
     setMessage(null)
+
+    if (mode === 'reset') {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      })
+      if (error) {
+        setError(error.message)
+      } else {
+        setMessage('Password reset link sent — check your email.')
+      }
+      setSubmitting(false)
+      return
+    }
 
     if (mode === 'signup') {
       const { error } = await supabase.auth.signUp({
@@ -71,7 +84,7 @@ export function LoginPage() {
             Nex<span style={{ color: 'var(--primary)' }}>Bookings</span>
           </h1>
           <p className="mono-accent" style={{ marginTop: '0.5rem', color: 'var(--text-secondary)' }}>
-            {mode === 'signup' ? 'Create your account' : 'Sign in to your account'}
+            {mode === 'signup' ? 'Create your account' : mode === 'reset' ? 'Reset your password' : 'Sign in to your account'}
           </p>
         </div>
 
@@ -146,20 +159,33 @@ export function LoginPage() {
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.375rem', color: 'var(--text-secondary)' }}>
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min. 8 characters"
-              style={inputStyle}
-            />
-          </div>
+          {mode !== 'reset' && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
+                <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                  Password
+                </label>
+                {mode === 'signin' && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode('reset'); setError(null); setMessage(null) }}
+                    style={{ fontSize: '0.8125rem', color: 'var(--primary)', background: 'none', cursor: 'pointer' }}
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                style={inputStyle}
+              />
+            </div>
+          )}
 
           <button
             type="submit"
@@ -181,18 +207,44 @@ export function LoginPage() {
               ? 'Please wait…'
               : mode === 'signup'
                 ? 'Create account'
-                : 'Sign in'}
+                : mode === 'reset'
+                  ? 'Send reset link'
+                  : 'Sign in'}
           </button>
         </form>
 
         <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-          {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
-          <button
-            onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setMessage(null) }}
-            style={{ color: 'var(--primary)', fontWeight: 500, background: 'none', cursor: 'pointer' }}
-          >
-            {mode === 'signin' ? 'Sign up' : 'Sign in'}
-          </button>
+          {mode === 'reset' ? (
+            <>
+              Remember your password?{' '}
+              <button
+                onClick={() => { setMode('signin'); setError(null); setMessage(null) }}
+                style={{ color: 'var(--primary)', fontWeight: 500, background: 'none', cursor: 'pointer' }}
+              >
+                Sign in
+              </button>
+            </>
+          ) : mode === 'signin' ? (
+            <>
+              Don't have an account?{' '}
+              <button
+                onClick={() => { setMode('signup'); setError(null); setMessage(null) }}
+                style={{ color: 'var(--primary)', fontWeight: 500, background: 'none', cursor: 'pointer' }}
+              >
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <button
+                onClick={() => { setMode('signin'); setError(null); setMessage(null) }}
+                style={{ color: 'var(--primary)', fontWeight: 500, background: 'none', cursor: 'pointer' }}
+              >
+                Sign in
+              </button>
+            </>
+          )}
         </p>
       </div>
 
