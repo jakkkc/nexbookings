@@ -92,14 +92,11 @@ export function StaffPage() {
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault()
     if (!user) return
-    if (inviteForm.property_ids.length === 0) {
-      setInviteError('Assign at least one property.')
-      return
-    }
-
     setInviting(true)
     setInviteError(null)
     setInviteSuccess(null)
+
+    const { data: { session } } = await supabase.auth.getSession()
 
     const { error } = await supabase.functions.invoke('invite-staff', {
       body: {
@@ -108,6 +105,9 @@ export function StaffPage() {
         role: inviteForm.role,
         property_ids: inviteForm.property_ids,
         account_id: user.account_id,
+      },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
       },
     })
 
