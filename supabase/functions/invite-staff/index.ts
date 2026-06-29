@@ -115,8 +115,6 @@ Deno.serve(async (req) => {
     }
 
     // ── 6. Create the auth user with metadata ─────────────────
-    const tempPassword = crypto.randomUUID()
-
     const { data: newAuthUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password,
@@ -129,7 +127,11 @@ Deno.serve(async (req) => {
     })
 
     if (createError || !newAuthUser?.user) {
-      return new Response(JSON.stringify({ error: createError?.message || 'Failed to create user' }), {
+      const msg = createError?.message || 'Failed to create user'
+      const isDuplicate = msg.toLowerCase().includes('already') || msg.toLowerCase().includes('duplicate')
+      return new Response(JSON.stringify({
+        error: isDuplicate ? 'A user with this email already exists.' : msg
+      }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
