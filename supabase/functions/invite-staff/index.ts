@@ -12,6 +12,7 @@ interface InvitePayload {
   role: 'manager' | 'receptionist'
   property_ids: string[]
   account_id: string
+  password: string
 }
 
 Deno.serve(async (req) => {
@@ -47,9 +48,9 @@ Deno.serve(async (req) => {
 
     // ── 2. Parse and validate the payload ────────────────────
     const payload: InvitePayload = await req.json()
-    const { email, full_name, role, property_ids, account_id } = payload
+    const { email, full_name, role, property_ids, account_id, password } = payload
 
-    if (!email || !role || !account_id || !property_ids?.length) {
+    if (!email || !role || !account_id || !password) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
 
     const { data: newAuthUser, error: createError } = await adminClient.auth.admin.createUser({
       email,
-      password: tempPassword,
+      password,
       email_confirm: true,
       user_metadata: {
         account_id,

@@ -34,6 +34,7 @@ export function StaffPage() {
     full_name: '',
     role: 'receptionist' as 'manager' | 'receptionist',
     property_ids: [] as string[],
+    password: '',
   })
   const [inviting, setInviting] = useState(false)
   const [inviteError, setInviteError] = useState<string | null>(null)
@@ -105,6 +106,7 @@ export function StaffPage() {
         role: inviteForm.role,
         property_ids: inviteForm.property_ids,
         account_id: user.account_id,
+        password: inviteForm.password,
       },
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
@@ -117,7 +119,7 @@ export function StaffPage() {
       setInviteError(error.message || 'Failed to send invite')
     } else {
       setInviteSuccess(`Invite sent to ${inviteForm.email}`)
-      setInviteForm({ email: '', full_name: '', role: 'receptionist', property_ids: [] })
+      setInviteForm({ email: '', full_name: '', role: 'receptionist', property_ids: [], password: '' })
       setShowForm(false)
       await fetchData()
     }
@@ -222,6 +224,14 @@ export function StaffPage() {
             </div>
 
             <div>
+              <label style={labelStyle}>Temporary password</label>
+              <input type="text" required minLength={8} value={inviteForm.password} onChange={e => setInviteForm(f => ({ ...f, password: e.target.value }))} placeholder="Min. 8 characters — share via WhatsApp" style={inputStyle} />
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.375rem' }}>
+                Share this with the staff member via WhatsApp or phone. They can change it after logging in.
+              </p>
+            </div>
+
+            <div>
               <label style={labelStyle}>Assign to properties</label>
               {properties.length === 0 ? (
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>No properties yet.</p>
@@ -244,7 +254,7 @@ export function StaffPage() {
             </div>
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button type="submit" disabled={inviting || !inviteForm.email} style={{ flex: 1, padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--primary)', color: 'var(--bg)', fontWeight: 500, cursor: inviting ? 'not-allowed' : 'pointer', opacity: inviting ? 0.7 : 1, fontSize: '0.9375rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <button type="submit" disabled={inviting || !inviteForm.email || inviteForm.password.length < 8} style={{ flex: 1, padding: '0.625rem', borderRadius: '0.5rem', background: 'var(--primary)', color: 'var(--bg)', fontWeight: 500, cursor: inviting ? 'not-allowed' : 'pointer', opacity: inviting ? 0.7 : 1, fontSize: '0.9375rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                 <Mail size={15} strokeWidth={1.5} />
                 {inviting ? 'Sending invite…' : 'Send invite'}
               </button>
