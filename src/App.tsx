@@ -13,6 +13,7 @@ import { BookingDetailPage } from './pages/BookingDetailPage'
 import { StaffPage } from './pages/StaffPage'
 import { PrintDocumentPage } from './pages/PrintDocumentPage'
 import { LandingPage } from './pages/LandingPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -57,6 +58,10 @@ export default function App() {
               <ProtectedRoute allowedRoles={['owner', 'super_admin']}>
                 <StaffPage />
               </ProtectedRoute>
+            } />
+
+            <Route path="/settings" element={
+              <ProtectedRoute><SettingsPage /></ProtectedRoute>
             } />
 
             <Route path="*" element={<Navigate to="/" replace />} />

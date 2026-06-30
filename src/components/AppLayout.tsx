@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Users,
   LogOut,
+  Settings,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -44,6 +45,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Staff',
     icon: <Users size={18} strokeWidth={1.5} />,
     roles: ['owner', 'super_admin'],
+  },
+  {
+    to: '/settings',
+    label: 'Settings',
+    icon: <Settings size={18} strokeWidth={1.5} />,
+    roles: ['owner', 'manager', 'receptionist', 'super_admin'],
   },
 ]
 
