@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { ThemeSwitcher } from './ThemeSwitcher'
+import { WelcomeTour } from './WelcomeTour'
 
 interface NavItem {
   to: string
@@ -84,6 +85,8 @@ export function AppLayout({ children }: Props) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)' }}>
+
+      <WelcomeTour />
 
       {/* Mobile overlay */}
       {mobileOpen && (

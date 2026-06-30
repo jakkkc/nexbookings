@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { Lock, Check } from 'lucide-react'
+import { Lock, Check, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { AppLayout } from '../components/AppLayout'
+
+const TOUR_SEEN_KEY_PREFIX = 'nexbookings-tour-seen-'
 
 export function SettingsPage() {
   const { user } = useAuth()
@@ -12,6 +14,13 @@ export function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+
+  function replayTour() {
+    if (user) {
+      localStorage.removeItem(TOUR_SEEN_KEY_PREFIX + user.id)
+      window.location.reload()
+    }
+  }
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault()
@@ -131,6 +140,26 @@ export function SettingsPage() {
             {saving ? 'Updating…' : 'Update password'}
           </button>
         </form>
+      </div>
+
+      <div className="glass-card" style={{ padding: '1.5rem', maxWidth: '28rem', marginTop: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '0.75rem' }}>
+          <Sparkles size={18} strokeWidth={1.5} style={{ color: 'var(--primary)' }} />
+          <p style={{ fontWeight: 500, fontSize: '1rem' }}>Welcome tour</p>
+        </div>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.55 }}>
+          Want a refresher on what NexBookings can do?
+        </p>
+        <button
+          onClick={replayTour}
+          style={{
+            padding: '0.625rem 1.25rem', borderRadius: '0.5rem',
+            background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
+            color: 'var(--text)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 500,
+          }}
+        >
+          Take the tour again
+        </button>
       </div>
     </AppLayout>
   )
