@@ -1,0 +1,13 @@
+/* Fix native <select> dropdown options being unreadable across themes.
+   Browsers render <option> using OS-level styling by default and ignore
+   most CSS — explicitly setting background/color here forces it to
+   respect the current theme instead of falling back to white-on-white. */
+
+select {
+  color-scheme: light dark;
+}
+
+select option {
+  background-color: var(--bg);
+  color: var(--text);
+}
