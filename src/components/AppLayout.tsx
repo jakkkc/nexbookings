@@ -7,6 +7,7 @@ import {
   Users,
   LogOut,
   Settings,
+  Sparkles,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -38,6 +39,12 @@ const NAV_ITEMS: NavItem[] = [
     to: '/bookings',
     label: 'Bookings',
     icon: <CalendarDays size={18} strokeWidth={1.5} />,
+    roles: ['owner', 'manager', 'receptionist', 'super_admin'],
+  },
+  {
+    to: '/assistant',
+    label: 'AI Assistant',
+    icon: <Sparkles size={18} strokeWidth={1.5} />,
     roles: ['owner', 'manager', 'receptionist', 'super_admin'],
   },
   {
