@@ -142,6 +142,7 @@ Deno.serve(async (req) => {
       const assignments = property_ids.map((property_id: string) => ({
         user_id: newAuthUser.user.id,
         property_id,
+        role_scope: role, // 'manager' or 'receptionist'
       }))
 
       const { error: assignError } = await adminClient

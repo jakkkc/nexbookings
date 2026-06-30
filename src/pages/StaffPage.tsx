@@ -149,8 +149,10 @@ export function StaffPage() {
 
     // Insert new ones
     if (assignmentDraft.length > 0) {
+      const member = staff.find(s => s.id === userId)
+      const roleScope = member?.role === 'manager' ? 'manager' : 'receptionist'
       const { error: insError } = await supabase.from('staff_assignments').insert(
-        assignmentDraft.map(property_id => ({ user_id: userId, property_id }))
+        assignmentDraft.map(property_id => ({ user_id: userId, property_id, role_scope: roleScope }))
       )
       if (insError) {
         alert(`Failed to save assignments: ${insError.message}`)
