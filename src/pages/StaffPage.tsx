@@ -140,13 +140,23 @@ export function StaffPage() {
     setSavingAssignments(true)
 
     // Delete all existing assignments for this user
-    await supabase.from('staff_assignments').delete().eq('user_id', userId)
+    const { error: delError } = await supabase.from('staff_assignments').delete().eq('user_id', userId)
+    if (delError) {
+      alert(`Failed to clear old assignments: ${delError.message}`)
+      setSavingAssignments(false)
+      return
+    }
 
     // Insert new ones
     if (assignmentDraft.length > 0) {
-      await supabase.from('staff_assignments').insert(
+      const { error: insError } = await supabase.from('staff_assignments').insert(
         assignmentDraft.map(property_id => ({ user_id: userId, property_id }))
       )
+      if (insError) {
+        alert(`Failed to save assignments: ${insError.message}`)
+        setSavingAssignments(false)
+        return
+      }
     }
 
     setEditingAssignments(null)
