@@ -19,6 +19,25 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
+const CACHE_KEY = 'nexbookings-user-profile'
+
+function getCachedUser(userId: string): AppUser | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const cached = JSON.parse(raw)
+    if (cached.id === userId) return cached
+  } catch { /* ignore */ }
+  return null
+}
+
+function setCachedUser(user: AppUser) {
+  try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(user)) } catch { /* ignore */ }
+}
+
+function clearCachedUser() {
+  try { sessionStorage.removeItem(CACHE_KEY) } catch { /* ignore */ }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
@@ -26,6 +45,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   async function loadUser(authUser: User) {
+    // Check cache first — avoids a DB round trip on repeat loads
+    const cached = getCachedUser(authUser.id)
+    if (cached) {
+      setUser(cached)
+      return
+    }
+
     const { data, error } = await supabase
       .from('users')
       .select('id, email, full_name, role, account_id')
@@ -37,30 +63,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null)
     } else {
       setUser(data)
+      setCachedUser(data)
     }
   }
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       setSession(session)
       if (session?.user) {
-        loadUser(session.user).finally(() => setLoading(false))
+        // Set loading false immediately — don't block on profile fetch
+        const cached = getCachedUser(session.user.id)
+        if (cached) {
+          setUser(cached)
+          setLoading(false)
+        } else {
+          // Show app as soon as session is confirmed, load profile in background
+          setLoading(false)
+          loadUser(session.user)
+        }
       } else {
         setLoading(false)
       }
     })
 
-    // Listen for auth changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event: any, session: any) => {
         setSession(session)
         if (session?.user) {
-          await loadUser(session.user)
+          const cached = getCachedUser(session.user.id)
+          if (cached) {
+            setUser(cached)
+            setLoading(false)
+          } else {
+            setLoading(false)
+            loadUser(session.user)
+          }
         } else {
           setUser(null)
+          setLoading(false)
         }
-        setLoading(false)
       }
     )
 
@@ -69,6 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   async function signOut() {
     await supabase.auth.signOut()
+    clearCachedUser()
     setUser(null)
     setSession(null)
   }
