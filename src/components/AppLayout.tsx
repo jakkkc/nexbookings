@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Building2, CalendarDays, Users,
   LogOut, ChevronLeft, ChevronRight, Settings,
-  Sparkles, MoreHorizontal, X,
+  Sparkles, MoreHorizontal, X, BarChart2,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { ThemeSwitcher } from './ThemeSwitcher'
@@ -20,6 +20,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} strokeWidth={1.5} />, roles: ['owner', 'manager', 'receptionist', 'super_admin'] },
   { to: '/properties', label: 'Properties', icon: <Building2 size={20} strokeWidth={1.5} />, roles: ['owner', 'manager', 'receptionist', 'super_admin'] },
   { to: '/bookings', label: 'Bookings', icon: <CalendarDays size={20} strokeWidth={1.5} />, roles: ['owner', 'manager', 'receptionist', 'super_admin'] },
+  { to: '/reports', label: 'Reports', icon: <BarChart2 size={20} strokeWidth={1.5} />, roles: ['owner', 'manager', 'super_admin'] },
   { to: '/assistant', label: 'AI', icon: <Sparkles size={20} strokeWidth={1.5} />, roles: ['owner', 'manager', 'receptionist', 'super_admin'] },
   { to: '/staff', label: 'Staff', icon: <Users size={20} strokeWidth={1.5} />, roles: ['owner', 'super_admin'] },
   { to: '/settings', label: 'Settings', icon: <Settings size={20} strokeWidth={1.5} />, roles: ['owner', 'manager', 'receptionist', 'super_admin'] },

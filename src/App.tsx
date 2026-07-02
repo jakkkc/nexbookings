@@ -15,6 +15,7 @@ import { PrintDocumentPage } from './pages/PrintDocumentPage'
 import { LandingPage } from './pages/LandingPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { AssistantPage } from './pages/AssistantPage'
+import { ReportsPage } from './pages/ReportsPage'
 
 export default function App() {
   return (
@@ -58,6 +59,12 @@ export default function App() {
             <Route path="/staff" element={
               <ProtectedRoute allowedRoles={['owner', 'super_admin']}>
                 <StaffPage />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/reports" element={
+              <ProtectedRoute allowedRoles={['owner', 'manager', 'super_admin']}>
+                <ReportsPage />
               </ProtectedRoute>
             } />
 
